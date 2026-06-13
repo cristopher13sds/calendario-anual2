@@ -710,7 +710,7 @@ document.getElementById(
 currentEventId = null;
 
 renderCalendar();
-
+updateDashboard();
 });
 
 
