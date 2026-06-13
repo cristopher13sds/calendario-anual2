@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calendario Anual</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div class="header">
+
+<div class="year-box">
+<input id="yearInput" type="number">
+</div>
+
+<div class="title-app">
+📅 Calendario Anual
+</div>
+
+</div>
+
+<div class="controls">
+
+<button onclick="openNewEvent()">
+➕ Evento
+</button>
+
+<button onclick="exportData()">
+📤 Exportar
+</button>
+
+<label class="import-btn">
+📥 Importar
+<input type="file" id="importFile" hidden>
+</label>
+
+</div>
+
+<div class="dashboard">
+
+<div class="stats">
+
+<div class="stat-card success">
+✅
+<span id="completedCount">0</span>
+</div>
+
+<div class="stat-card pending">
+⏳
+<span id="pendingCount">0</span>
+</div>
+
+<div class="stat-card failed">
+❌
+<span id="failedCount">0</span>
+</div>
+
+</div>
+
+<button
+class="notification-btn"
+onclick="openNotifications()">
+
+🔔
+<span id="notificationCount">0</span>
+
+</button>
+
+</div>
+
+
+<div id="calendar" class="calendar"></div>
+
+<div class="modal" id="modal">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h2 id="modalTitle">Nuevo Evento</h2>
+
+<button class="close-btn"
+onclick="closeModal()">
+✖
+</button>
+
+</div>
+
+<select id="template">
+
+<option value="">
+📋 Plantilla rápida
+</option>
+
+<option value="cumple">
+🎂 Cumpleaños
+</option>
+
+<option value="viaje">
+✈️ Viaje
+</option>
+
+<option value="vacaciones">
+🏖 Vacaciones
+</option>
+
+<option value="reunion">
+💼 Reunión
+</option>
+
+<option value="medico">
+🏥 Médico
+</option>
+
+<option value="estudio">
+📚 Estudio
+</option>
+
+</select>
+
+<input
+id="title"
+placeholder="Título del evento">
+
+<select id="month"></select>
+
+<div class="range-days">
+
+<div>
+<label>Inicio</label>
+
+<input
+id="dayStart"
+type="number"
+min="1"
+max="31">
+</div>
+
+<div>
+<label>Fin</label>
+
+<input
+id="dayEnd"
+type="number"
+min="1"
+max="31">
+</div>
+
+</div>
+
+<textarea
+id="description"
+placeholder="Descripción">
+</textarea>
+
+<select id="color">
+
+<option value="orange">
+🟧 Naranja
+</option>
+
+<option value="green">
+🟩 Verde
+</option>
+
+<option value="blue">
+🟦 Azul
+</option>
+
+<option value="pink">
+🩷 Rosa
+</option>
+
+<option value="yellow">
+🟨 Amarillo
+</option>
+
+<option value="purple">
+🟪 Morado
+</option>
+
+</select>
+
+<h4>Emoji</h4>
+
+<div id="iconPicker">
+
+<span>🎂</span>
+<span>✈️</span>
+<span>🏖</span>
+<span>🚀</span>
+<span>🌎</span>
+<span>🎉</span>
+<span>💼</span>
+<span>🏥</span>
+<span>📚</span>
+<span>⚽</span>
+<span>❤️</span>
+<span>⭐</span>
+
+</div>
+
+<input
+type="hidden"
+id="icon">
+
+<button
+class="save-btn"
+onclick="saveEvent()">
+
+Guardar Evento
+
+</button>
+
+</div>
+
+</div>
+
+
+<div class="modal" id="eventModal">
+
+<div class="modal-content event-view">
+
+<button
+class="close-event-modal"
+onclick="closeEventModal()">
+
+✖
+
+</button>
+
+<div id="eventInfo"></div>
+
+<div class="event-actions">
+
+<button
+class="done-btn"
+id="doneEventBtn">
+
+✅ Cumplido
+
+</button>
+
+<button
+class="edit-btn"
+id="editEventBtn">
+
+✏️ Editar
+
+</button>
+
+<button
+class="delete-btn"
+id="deleteEventBtn">
+
+🗑️ Eliminar
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div
+class="modal"
+id="notificationModal">
+
+<div
+class="modal-content notification-view">
+
+<div class="modal-header">
+
+<h2>
+🔔 Eventos
+</h2>
+
+<button
+class="close-btn"
+onclick="closeNotifications()">
+
+✖
+
+</button>
+
+</div>
+
+<div id="notificationList"></div>
+
+</div>
+
+</div>
+<script src="app.js"></script>
+
+</body>
+</html>
