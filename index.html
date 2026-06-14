@@ -207,6 +207,66 @@ placeholder="Descripción">
 type="hidden"
 id="icon">
 
+<input
+type="hidden"
+id="icon">
+
+<h4>📎 Evidencia</h4>
+
+<div class="evidence-section">
+
+<label
+class="evidence-upload">
+
+📎 Seleccionar archivo
+
+<input
+type="file"
+id="evidenceFile"
+accept=".jpg,.jpeg,.png,.gif,.webp,.pdf"
+hidden>
+
+</label>
+
+<div
+id="evidencePreview"
+class="evidence-preview">
+
+<div class="no-evidence">
+
+Sin evidencia adjunta
+
+</div>
+
+</div>
+
+<div
+class="evidence-actions">
+
+<a
+id="downloadEvidenceBtn"
+class="download-btn"
+style="display:none;"
+download>
+
+⬇️ Descargar
+
+</a>
+
+<button
+type="button"
+id="removeEvidenceBtn"
+class="remove-btn"
+style="display:none;">
+
+🗑️ Quitar
+
+</button>
+
+</div>
+
+</div>
+
 <button
 class="save-btn"
 onclick="saveEvent()">
@@ -236,13 +296,13 @@ onclick="closeEventModal()">
 
 <div class="event-actions">
 
-<button
+<!--<button
 class="done-btn"
 id="doneEventBtn">
 
 ✅ Cumplido
 
-</button>
+</button>-->
 
 <button
 class="edit-btn"

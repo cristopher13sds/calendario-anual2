@@ -1,4 +1,5 @@
 let currentEventId = null;
+let evidenceData = null;
 const months = [
 "Enero","Febrero","Marzo","Abril",
 "Mayo","Junio","Julio","Agosto",
@@ -86,16 +87,57 @@ document.getElementById(
 ).style.display="flex";
 
 }
+
+
 function openNewEvent(){
+
+if(hasOtherUncompletedEvents()){
+
+alert(
+"⚠️ Tienes eventos NO CUMPLIDOS. Debes resolverlos antes de crear nuevos eventos."
+);
+
+return;
+
+}
 
 document.getElementById(
 "modalTitle"
 ).textContent =
 "Nuevo Evento";
+evidenceData = null;
+
+document.getElementById(
+"evidenceFile"
+).value = ""; 
+
+document.getElementById(
+"evidencePreview"
+).innerHTML =
+`
+
+<div class="no-evidence">
+
+Sin evidencia adjunta
+
+</div>
+`;
+
+document.getElementById(
+"downloadEvidenceBtn"
+).style.display =
+"none";
+
+document.getElementById(
+"removeEvidenceBtn"
+).style.display =
+"none";
 
 addEvent();
 
 }
+
+
 function closeModal(){
 
 document.getElementById("modal")
@@ -264,8 +306,6 @@ year:+yearInput.value,
 
 title:title.value,
 
-cumplido:false,
-
 month:+month.value,
 
 dayStart:start,
@@ -276,7 +316,14 @@ description:description.value,
 
 icon:icon.value,
 
-color:color.value
+color:color.value,
+
+evidence:evidenceData,
+
+cumplido:
+evidenceData
+? true
+: false
 
 });
 
@@ -585,6 +632,7 @@ document.getElementById(
 ).innerHTML =
 
 `
+
 <div class="event-icon">
 ${ev.icon || "📌"}
 </div>
@@ -614,7 +662,83 @@ ${getEventStatus(ev)}
 ${ev.description || "Sin descripción"}
 
 </div>
+
+${
+ev.evidence
+?
+
+`
+
+<div class="event-evidence">
+
+<h4>
+📎 Evidencia
+</h4>
+
+${
+ev.evidence.type.includes("image")
+
+?
+
+`<img
+src="${ev.evidence.data}"
+class="event-evidence-image">`
+
+:
+
+`
+
+<div class="event-evidence-file">
+
+📄 ${ev.evidence.name}
+
+</div>
+`
+}
+
+<a
+href="${ev.evidence.data}"
+download="${ev.evidence.name}"
+class="download-btn">
+
+⬇️ Descargar evidencia
+
+</a>
+
+</div>
+`
+
+:
+
+`
+
+<div class="event-evidence-empty">
+
+📎 Sin evidencia adjunta
+
+</div>
+`
+}
+
 `;
+
+
+/*const doneBtn =
+document.getElementById(
+"doneEventBtn"
+);
+
+if(ev.cumplido){
+
+doneBtn.style.display =
+"none";
+
+}else{
+
+doneBtn.style.display =
+"inline-flex";
+
+}*/
 
 document.getElementById(
 "eventModal"
@@ -630,6 +754,31 @@ document
 .addEventListener(
 "click",
 ()=>{
+
+const currentEvent =
+events.find(
+x=>x.id===currentEventId
+);
+
+const hasOtherUncompleted =
+events.some(ev=>
+
+ev.id !== currentEventId &&
+
+getEventStatus(ev)
+.includes("No Cumplido")
+
+);
+
+if(hasOtherUncompleted){
+
+alert(
+"⚠️ No puedes editar este evento mientras existan otros eventos NO CUMPLIDOS."
+);
+
+return;
+
+}
 
 const ev =
 events.find(
@@ -660,6 +809,44 @@ ev.color;
 icon.value =
 ev.icon;
 
+/* ===== EVIDENCIA ===== */
+
+evidenceData =
+ev.evidence || null;
+
+if(evidenceData){
+
+showEvidencePreview(
+evidenceData
+);
+
+}else{
+
+document.getElementById(
+"evidencePreview"
+).innerHTML =
+`
+
+<div class="no-evidence">
+
+Sin evidencia adjunta
+
+</div>
+`;
+
+document.getElementById(
+"downloadEvidenceBtn"
+).style.display =
+"none";
+
+document.getElementById(
+"removeEvidenceBtn"
+).style.display =
+"none";
+
+}
+
+
 events =
 events.filter(
 x=>x.id!==ev.id
@@ -676,9 +863,9 @@ document.getElementById(
 
 addEvent();
 
-addEvent();
+}
+);
 
-});
 
 
 document
@@ -689,7 +876,47 @@ document
 "click",
 ()=>{
 
-if(currentEventId == null){
+const ev =
+events.find(
+x=>x.id===currentEventId
+);
+
+if(!ev){
+
+alert(
+"No se encontró el evento."
+);
+
+return;
+
+}
+
+const currentIsUncompleted =
+
+getEventStatus(ev)
+.includes("No Cumplido");
+
+if(
+
+hasUncompletedEvents() &&
+
+!currentIsUncompleted
+
+){
+
+alert(
+"⚠️ Existe al menos un evento NO CUMPLIDO. Debes resolverlo antes de eliminar otros eventos."
+);
+
+return;
+
+}
+
+if(
+!confirm(
+`¿Eliminar "${ev.title}"?`
+)
+){
 return;
 }
 
@@ -705,17 +932,21 @@ JSON.stringify(events)
 
 document.getElementById(
 "eventModal"
-).style.display="none";
+).style.display =
+"none";
 
 currentEventId = null;
 
 renderCalendar();
+
 updateDashboard();
+
 });
 
 
 
 
+/*
 document
 .getElementById(
 "doneEventBtn"
@@ -746,7 +977,9 @@ document.getElementById(
 ).style.display="none";
 
 }
-);
+
+
+);*/
 
 function updateDayLimits(){
 
@@ -902,5 +1135,246 @@ document.getElementById(
 "none";
 
 }
+
+function hasOtherUncompletedEvents(
+currentId
+){
+
+return events.some(ev=>{
+
+return (
+
+ev.id !== currentId &&
+
+getEventStatus(ev)
+.includes("No Cumplido")
+
+);
+
+});
+
+}
+
+function hasUncompletedEvents(){
+
+return events.some(ev=>{
+
+return getEventStatus(ev)
+.includes("No Cumplido");
+
+});
+
+}
+
+
+document
+.getElementById(
+"evidenceFile"
+)
+.addEventListener(
+"change",
+e=>{
+
+const file =
+e.target.files[0];
+
+if(!file)
+return;
+
+const reader =
+new FileReader();
+
+reader.onload =
+function(ev){
+
+evidenceData = {
+
+name:file.name,
+
+type:file.type,
+
+data:ev.target.result
+
+};
+
+showEvidencePreview(
+evidenceData
+);
+
+};
+
+reader.readAsDataURL(
+file
+);
+
+}
+);
+
+function showEvidencePreview(
+evidence
+){
+
+const preview =
+document.getElementById(
+"evidencePreview"
+);
+
+const downloadBtn =
+document.getElementById(
+"downloadEvidenceBtn"
+);
+
+const removeBtn =
+document.getElementById(
+"removeEvidenceBtn"
+);
+
+if(
+evidence.type.includes(
+"image"
+)
+){
+
+preview.innerHTML =
+`<img src="${evidence.data}">`;
+
+}else{
+
+preview.innerHTML =
+`
+
+<div class="pdf-preview">
+
+<span>📄</span>
+
+<div>
+${evidence.name}
+</div>
+
+</div>
+`;
+
+}
+
+downloadBtn.href =
+evidence.data;
+
+downloadBtn.download =
+evidence.name;
+
+downloadBtn.style.display =
+"inline-block";
+
+removeBtn.style.display =
+"inline-block";
+
+}
+
+document
+.getElementById(
+"removeEvidenceBtn"
+)
+.addEventListener(
+"click",
+()=>{
+
+evidenceData = null;
+
+document.getElementById(
+"evidenceFile"
+).value = "";
+
+document.getElementById(
+"evidencePreview"
+).innerHTML =
+`
+
+<div class="no-evidence">
+
+Sin evidencia adjunta
+
+</div>
+`;
+
+document.getElementById(
+"downloadEvidenceBtn"
+).style.display =
+"none";
+
+document.getElementById(
+"removeEvidenceBtn"
+).style.display =
+"none";
+
+}
+);
+
+
+var maxDaysInput;
+
+document
+.getElementById("month")
+.addEventListener(
+"change",
+function(){
+
+const mes =
+parseInt(this.value);
+
+const anio =
+parseInt(yearInput.value);
+
+const ultimoDia =
+new Date(
+anio,
+mes + 1,
+0
+).getDate();
+
+dayStart.max =
+ultimoDia;
+
+dayEnd.max =
+ultimoDia;
+
+}
+);
+
+dayStart.addEventListener(
+"input",
+function(){
+
+const max =
+parseInt(this.max);
+
+if(
+parseInt(this.value) > max
+){
+
+this.value = max;
+
+}
+
+}
+);
+
+dayEnd.addEventListener(
+"input",
+function(){
+
+const max =
+parseInt(this.max);
+
+if(
+parseInt(this.value) > max
+){
+
+this.value = max;
+
+}
+
+}
+);
+
 renderCalendar();
 updateDashboard();
